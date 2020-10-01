@@ -1,0 +1,16 @@
+{
+    "name": "kukrik/toastr",
+    "description": "QCubed plugin for Toastr",
+    "type": "qcubed-library",
+    "keywords": ["qcubed", "toastr"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.6"
+    },
+    "autoload": {
+      "psr-4": {"QCubed\\Plugin\\": "src/"}
+    },
+    "extra": {
+        "examples": ["toastr.php"]
+    }
+}
