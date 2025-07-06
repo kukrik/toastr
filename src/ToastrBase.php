@@ -2,13 +2,13 @@
 
 namespace QCubed\Plugin;
 
-use QCubed as Q;
-use QCubed\Bootstrap as Bs;
+use QCubed\Control\Panel;
 use QCubed\Exception\Caller;
 use QCubed\Exception\InvalidCast;
 use QCubed\Project\Control\ControlBase;
 use QCubed\Project\Control\FormBase;
 use QCubed\Project\Application;
+use QCubed\ApplicationBase;
 use QCubed\Type;
 
 /**
@@ -17,7 +17,7 @@ use QCubed\Type;
  * @property string $AlertType *const specifies the type of warning: success, info, warning, error.
  *                              Here are used: TYPE_SUCCESS, TYPE_INFO, TYPE_WARNING, TYPE_ERROR.
  * @property string $PositionClass * const determines the position where the toast is displayed relative to the screen:
- *                                  'toast-top-right', 'toast-bottom-right', 'toast-bottom-left', 'toast-top-left',
+ *                                  'Toast-top-right', 'toast-bottom-right', 'toast-bottom-left', 'toast-top-left',
  *                                  'toast-top-full-width', 'toast-bottom-full-width', 'toast-top-center', 'toast-bottom-center'.
  *                                  Here are used: POSITION_TOP_RIGHT, POSITION_BOTTOM_RIGHT, POSITION_BOTTOM_LEFT,
  *                                  POSITION_TOP_LEFT, POSITION_TOP_FULL_WIDTH, POSITION_BOTTOM_FULL_WIDTH, POSITION_TOP_CENTER.
@@ -32,7 +32,7 @@ use QCubed\Type;
  * @property string $Title
  * @property string $MessageClass Default string 'toast-message', see in the style folder - toastr.css
  * @property string $TitleClass Default string 'toast-title', see in the style folder - toastr.css
- * @property boolean $TapToDismiss Default boolean true, If you want to force the toast and ignore the focus,
+ * @property boolean $TapToDismiss Default boolean true If you want to force the toast and ignore the focus,
  *                                                       add a button to the toast and write the function.
  * @property string $ToastClass  Default: string 'toast'
  * @property string $ContainerId Default: string 'toast-container', see in the style folder - toastr.css
@@ -43,7 +43,7 @@ use QCubed\Type;
  * @property integer $HideDuration Default integer 1000
  * @property integer $TimeOut Default integer 5000, // How long the toast will display without user interaction
  * @property integer $ExtendedTimeOut Default integer 1000, // How long the toast will display after a user hovers over it.
- *                   Optionally override the animation easing to show or hide the toasts. Default is swing. swing and
+ *                   Optionally override the animation easing to show or hide the toasts. Default is swing. Swing and
  *                   linear are built into jQuery.
  * @property string $ShowEasing Default string 'swing', // swing and linear are built into jQuery.
  * @property string $HideEasing Default string 'swing', // swing and linear are built into jQuery.
@@ -57,7 +57,7 @@ use QCubed\Type;
  * @property string $CloseHtml Default string '<button type="button">&times;</button>', Optionally override the close button's HTML.
  * @property string $CloseClass Default: string 'toast-close-button', see in the style folder - toastr.css
  * @property boolean $CloseButton Optionally enable a close button
- * @property boolean $NewestOnTop Default boolean true, Show newest toast at bottom (top is default).
+ * @property boolean $NewestOnTop Default boolean true, Show the newest toast at bottom (top is default).
  * @property boolean $PreventDuplicates Default boolean false, Rather than having identical toasts stack,
  *                                     set the preventDuplicates property to true. Duplicates are matched to the previous
  *                                     toast based on their message content.
@@ -70,105 +70,111 @@ use QCubed\Type;
  * @package QCubed\Plugin
  */
 
-class ToastrBase extends \QCubed\Control\Panel
+class ToastrBase extends Panel
 {
-    const TYPE_SUCCESS = 'success';
-    const TYPE_INFO = 'info';
-    const TYPE_WARNING = 'warning';
-    const TYPE_ERROR = 'error';
+    const string TYPE_SUCCESS = 'success';
+    const string TYPE_INFO = 'info';
+    const string TYPE_WARNING = 'warning';
+    const string TYPE_ERROR = 'error';
 
-    const POSITION_TOP_RIGHT = 'toast-top-right';
-    const POSITION_BOTTOM_RIGHT = 'toast-bottom-right';
-    const POSITION_BOTTOM_LEFT = 'toast-bottom-left';
-    const POSITION_TOP_LEFT = 'toast-top-left';
-    const POSITION_TOP_FULL_WIDTH = 'toast-top-full-width';
-    const POSITION_BOTTOM_FULL_WIDTH = 'toast-bottom-full-width';
-    const POSITION_TOP_CENTER = 'toast-top-center';
-    const POSITION_BOTTOM_CENTER = 'toast-bottom-center';
+    const string POSITION_TOP_RIGHT = 'toast-top-right';
+    const string POSITION_BOTTOM_RIGHT = 'toast-bottom-right';
+    const string POSITION_BOTTOM_LEFT = 'toast-bottom-left';
+    const string POSITION_TOP_LEFT = 'toast-top-left';
+    const string POSITION_TOP_FULL_WIDTH = 'toast-top-full-width';
+    const string POSITION_BOTTOM_FULL_WIDTH = 'toast-bottom-full-width';
+    const string POSITION_TOP_CENTER = 'toast-top-center';
+    const string POSITION_BOTTOM_CENTER = 'toast-bottom-center';
 
     /** @var string */
-    protected $strAlertType;
+    protected string $strAlertType;
     /** @var string */
-    protected $strPositionType;
-    /** @var string */
-    protected $strMessage = null;
-    /** @var string */
-    protected $strTitle = null;
-    /** @var string */
-    protected $strMessageClass = null;
-    /** @var string */
-    protected $strTitleClass = null;
+    protected string $strPositionType;
+    /** @var string|null */
+    protected ?string $strMessage = null;
+    /** @var string|null */
+    protected ?string $strTitle = null;
+    /** @var string|null */
+    protected ?string $strMessageClass = null;
+    /** @var string|null */
+    protected ?string $strTitleClass = null;
     /** @var boolean */
-    protected $blnTapToDismiss = null;
-    /** @var string */
-    protected $strToastClass = null;
-    /** @var string */
-    protected $strContainerId = null;
+    protected ?bool $blnTapToDismiss = null;
+    /** @var string|null */
+    protected ?string $strToastClass = null;
+    /** @var string|null */
+    protected ?string $strContainerId = null;
     /** @var boolean */
-    protected $blnDebug = null;
-    /** @var string */
-    protected $strShowMethod = null;
-    /** @var string */
-    protected $strHideMethod = null;
-    /** @var integer */
-    protected $intShowDuration = null;
-    /** @var integer */
-    protected $intHideDuration = null;
-    /** @var integer */
-    protected $intTimeOut = null;
-    /** @var integer */
-    protected $intExtendedTimeOut = null;
-    /** @var string */
-    protected $strShowEasing = null;
-    /** @var string */
-    protected $strHideEasing = null;
-    /** @var string */
-    protected $strCloseEasing = null;
+    protected ?bool $blnDebug = null;
+    /** @var string|null */
+    protected ?string $strShowMethod = null;
+    /** @var string|null */
+    protected ?string $strHideMethod = null;
+    /** @var integer|null */
+    protected ?int $intShowDuration = null;
+    /** @var integer|null */
+    protected ?int $intHideDuration = null;
+    /** @var integer|null */
+    protected ?int $intTimeOut = null;
+    /** @var integer|null */
+    protected ?int $intExtendedTimeOut = null;
+    /** @var string|null */
+    protected ?string $strShowEasing = null;
+    /** @var string|null */
+    protected ?string $strHideEasing = null;
+    /** @var string|null */
+    protected ?string $strCloseEasing = null;
     /** @var boolean */
-    protected $blnCloseOnHover = null;
-    /** @var array */
-    protected $arrIconClasses = null;
-    /** @var string */
-    protected $strIconClass = null;
-    /** @var string */
-    protected $strPositionClass = null;
+    protected ?bool $blnCloseOnHover = null;
+    /** @var array|null */
+    protected ?array $arrIconClasses = null;
+    /** @var string|null */
+    protected ?string $strIconClass = null;
+    /** @var string|null */
+    protected ?string $strPositionClass = null;
     /** @var boolean */
-    protected $blnEscapeHtml = null;
-    /** @var string */
-    protected $strTarget = null;
-    /** @var string */
-    protected $strCloseHtml = null;
-    /** @var string */
-    protected $strCloseClass = null;
+    protected ?bool $blnEscapeHtml = null;
+    /** @var string|null */
+    protected ?string $strTarget = null;
+    /** @var string|null */
+    protected ?string $strCloseHtml = null;
+    /** @var string|null */
+    protected ?string $strCloseClass = null;
     /** @var boolean */
-    protected $blnCloseButton = null;
+    protected ?bool $blnCloseButton = null;
     /** @var boolean */
-    protected $blnNewestOnTop = null;
+    protected ?bool $blnNewestOnTop = null;
     /** @var boolean */
-    protected $blnPreventDuplicates = null;
+    protected ?bool $blnPreventDuplicates = null;
     /** @var boolean */
-    protected $blnProgressBar = null;
-    /** @var string */
-    protected $strProgressClass = null;
+    protected ?bool $blnProgressBar = null;
+    /** @var string|null */
+    protected ?string $strProgressClass = null;
     /** @var boolean */
-    protected $blnRTL = null;
+    protected ?bool $blnRTL = null;
 
     /**
-     * Toastr constructor
+     * Constructor method for initializing the object.
      *
-     * @param ControlBase|FormBase|null $objParentObject
-     * @param null|string $strControlId
+     * @param ControlBase|FormBase $objParentObject The parent control or form object.
+     * @param string|null $strControlId Optional control ID for the object. If null, a default ID will be generated.
+     *
+     * @throws Caller
      */
-    public function __construct($objParentObject, $strControlId = null) {
+    public function __construct(ControlBase|FormBase $objParentObject, ?string $strControlId = null) {
         parent::__construct($objParentObject, $strControlId);
         $this->registerFiles();
     }
 
     /**
+     * Registers necessary JavaScript and CSS files required for the component's functionality and appearance.
+     *
+     * @return void
      * @throws Caller
      */
 
-    protected function registerFiles() {
+    protected function registerFiles(): void
+    {
         $this->AddJavascriptFile(QCUBED_TOASTR_ASSETS_URL . "/js/toastr.js");
         $this->addCssFile(QCUBED_TOASTR_ASSETS_URL . "/css/toastr.css");
         $this->addCssFile(QCUBED_TOASTR_ASSETS_URL . "/css/toastr.fontawesome.css");
@@ -177,18 +183,24 @@ class ToastrBase extends \QCubed\Control\Panel
     }
 
     /**
-     * @return string
+     * Retrieves the jQuery setup function name.
+     *
+     * @return string The name of the jQuery setup function.
      */
-    public function getJqSetupFunction()
+    public function getJqSetupFunction(): string
     {
         return 'toastr';
     }
 
     /**
-     * Returns an array of options that get set to the setup function as javascript.
-     * @return null
+     * Constructs an array of jQuery options for a customizable UI/UX element based on the
+     * object's properties. Each property is checked for a non-null value, and if set, the
+     * corresponding key-value pair is added to the option array.
+     *
+     * @return array An associative array of jQuery options if at least one property has
+     *                    a non-null value, or null if no options are set.
      */
-    protected function makeJqOptions()
+    protected function makeJqOptions(): array
     {
         $jqOptions = null;
         if (!is_null($val = $this->TapToDismiss)) {$jqOptions['tapToDismiss'] = $val;}
@@ -222,31 +234,36 @@ class ToastrBase extends \QCubed\Control\Panel
     }
 
     /**
+     * Triggers a JavaScript notification using the specified alert type, message, and title.
+     * Optionally includes additional jQuery options if provided.
      *
+     * @return void
+     * @throws Caller
      */
-    public function notify()
+    public function notify(): void
     {
         $jqOptions = $this->makeJqOptions();
 
         if (empty($jqOptions)) {
             Application::executeJavaScript(sprintf('%s.%s("%s", "%s")',
-                $this->getJqSetupFunction(), $this->AlertType, $this->Message, $this->Title), Application::PRIORITY_HIGH);
+                $this->getJqSetupFunction(), $this->AlertType, $this->Message, $this->Title), ApplicationBase::PRIORITY_HIGH);
         } else {
             Application::executeJavaScript(sprintf('%s.%s("%s", "%s", %s)',
                 $this->getJqSetupFunction(), $this->AlertType, $this->Message, $this->Title, json_encode($jqOptions)),
-                Application::PRIORITY_HIGH);
+                ApplicationBase::PRIORITY_HIGH);
         }
     }
 
     /**
-     * PHP magic method
+     * Magic getter method to retrieve the value of a property by name.
      *
-     * @param string $strName
+     * @param string $strName The name of the property to retrieve.
      *
-     * @return mixed
-     * @throws \Exception|Caller
+     * @return mixed The value of the requested property. Returns different types depending on the property accessed.
+     *
+     * @throws Caller If the requested property does not exist or cannot be accessed.
      */
-    public function __get($strName)
+    public function __get(string $strName): mixed
     {
         switch ($strName) {
             case 'AlertType': return $this->strAlertType;
@@ -291,14 +308,17 @@ class ToastrBase extends \QCubed\Control\Panel
     }
 
     /**
-     * PHP magic method
+     * Magic method to set properties dynamically based on the property name.
      *
-     * @param string $strName
-     * @param string $mixValue
+     * @param string $strName The name of the property to set.
+     * @param mixed $mixValue The value to assign to the specified property.
      *
-     * @throws \Exception|Caller|InvalidCast
+     * @return void
+     *
+     * @throws InvalidCast Throws an exception if the value provided cannot be cast to the expected type.
+     * @throws Caller Throws an exception if the property name is invalid.
      */
-    public function __set($strName, $mixValue)
+    public function __set(string $strName, mixed $mixValue): void
     {
         switch ($strName) {
 

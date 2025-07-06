@@ -22,7 +22,7 @@
         <p>The Toast can implement toasts as documented in the Toastr Javascript documentation.</p>
         <p>Here are some examples.</p>
     </div>
-    <div>
+    <div style="margin: 25px 0px;">
         <?= _r($this->btn1); ?>
         <?= _r($this->btn2); ?>
         <?= _r($this->btn3); ?>
