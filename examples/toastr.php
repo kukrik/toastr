@@ -6,6 +6,12 @@ use QCubed\Bootstrap as Bs;
 use QCubed\Exception\Caller;
 use QCubed\Project\Control\FormBase as Form;
 
+/**
+ * Class ExamplesForm
+ *
+ * Handles the creation and display of a form containing Toast notifications and buttons.
+ * Configures actions for each button to trigger corresponding Toast messages.
+ */
 class ExamplesForm extends Form
 {
     protected Q\Plugin\Toastr $toastr1;
@@ -79,18 +85,39 @@ class ExamplesForm extends Form
      * @param mixed $strParameter Additional parameters for the notification.
      *
      * @return void The result of the toastr notification execution.
+     * @throws Caller
      */
     public function showToast_1(string $strFormId, string $strControlId, mixed $strParameter): void
     {
         $this->toastr1->notify();
     }
 
+    /**
+     * Displays a toast notification using the toastr library.
+     *
+     * @param string $strFormId The ID of the form triggering the notification.
+     * @param string $strControlId The ID of the control that interacts with the event.
+     * @param mixed $strParameter Additional parameters for the notification.
+     *
+     * @return void The result of the toastr notification execution.
+     * @throws Caller
+     */
     public function showToast_2(string $strFormId, string $strControlId, mixed $strParameter): void
     {
         $this->toastr2->notify();
     }
 
-    public function showToast_3(string $strFormId, string $strControlId, mixed $strParameter): void
+    /**
+     * Displays a toast notification using the toastr library.
+     *
+     * @param string $strFormId The ID of the form triggering the notification.
+     * @param string $strControlId The ID of the control that interacts with the event.
+     * @param mixed $strParameter Additional parameters for the notification.
+     *
+     * @return void The result of the toastr notification execution.
+     * @throws Caller
+     */
+public function showToast_3(string $strFormId, string $strControlId, mixed $strParameter): void
     {
         $this->toastr3->notify();
     }

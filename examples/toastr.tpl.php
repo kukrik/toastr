@@ -14,15 +14,15 @@
 <section>
     <div class="instructions">
         <h1 class="instruction_title">The Toastr Control</h1>
-        <p>Toastr is a Javascript library for non-blocking notifications. jQuery is required. The goal is to create a simple
+        <p>Toastr is a JavaScript library for non-blocking notifications. jQuery is required. The goal is to create a simple
         core library that can be customized and extended.</p>
-        <p>Home page for the lib is <a href="https://github.com/CodeSeven/toastr">https://github.com/CodeSeven/toastr</a>
-        and demo is at <a href="https://codeseven.github.io/toastr/demo.html">https://codeseven.github.io/toastr/demo.html</a>,
-        where you can see example of use.</p>
-        <p>The Toast can implement toasts as documented in the Toastr Javascript documentation.</p>
+        <p>The home page for the lib is <a href="https://github.com/CodeSeven/toastr">https://github.com/CodeSeven/toastr</a>
+        and the demo is at <a href="https://codeseven.github.io/toastr/demo.html">https://codeseven.github.io/toastr/demo.html</a>,
+        where you can see an example of use.</p>
+        <p>The Toast can implement toasts as documented in the Toastr JavaScript documentation.</p>
         <p>Here are some examples.</p>
     </div>
-    <div style="margin: 25px 0px;">
+    <div style="margin: 25px 0;">
         <?= _r($this->btn1); ?>
         <?= _r($this->btn2); ?>
         <?= _r($this->btn3); ?>
